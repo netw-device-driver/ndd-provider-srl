@@ -127,6 +127,7 @@ func SetupRegistration(mgr ctrl.Manager, o controller.Options, l logging.Logger,
 	r := managed.NewReconciler(mgr,
 		resource.ManagedKind(srlv1.RegistrationGroupVersionKind),
 		managed.WithExternalConnecter(&connector{
+			log:         logging.NewNopLogger(),
 			kube:        mgr.GetClient(),
 			usage:       resource.NewNetworkNodeUsageTracker(mgr.GetClient(), &ndrv1.NetworkNodeUsage{}),
 			newClientFn: regclient.NewClient},
@@ -177,15 +178,18 @@ func SetupRegistration(mgr ctrl.Manager, o controller.Options, l logging.Logger,
 // A connector is expected to produce an ExternalClient when its Connect method
 // is called.
 type connector struct {
+	log         logging.Logger
 	kube        client.Client
 	usage       resource.Tracker
-	newClientFn func(ctx context.Context, creds ndd.Config) (register.RegistrationClient, error)
+	newClientFn func(ctx context.Context, cfg ndd.Config) (register.RegistrationClient, error)
 }
 
 // Connect produces an ExternalClient by:
 // 1. Tracking that the managed resource is using a TargetConfig.
 // 2. Getting the managed resource's TargetConfig with connection details
 func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.ExternalClient, error) {
+	log := c.log.WithValues("resosurce", mg.GetName())
+	log.Debug("Connect")
 	cr, ok := mg.(*srlv1.Registration)
 	if !ok {
 		return nil, errors.New(errUnexpectedObject)
@@ -208,14 +212,19 @@ func (c *connector) Connect(ctx context.Context, mg resource.Managed) (managed.E
 		return nil, errors.New(targetNotConfigured)
 	}
 
-	cl, err := c.newClientFn(ctx, ndd.Config{
+	cfg := ndd.Config{
 		SkipVerify: true,
 		Insecure:   true,
 		Target:     ndrv1.PrefixService + "-" + nn.Name + "." + ndrv1.NamespaceLocalK8sDNS + strconv.Itoa(*nn.Spec.GrpcServerPort),
-	})
+	}
+	log.Debug("Client config", "config", cfg)
+
+	cl, err := c.newClientFn(ctx, cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, errNewClient)
 	}
+
+	log.Debug("Client info", "client", cl)
 
 	return &external{client: cl}, nil
 }
@@ -275,7 +284,7 @@ func (e *external) Create(ctx context.Context, mg resource.Managed) (managed.Ext
 		DeviceType:             string(srlv1.DeviceTypeSRL),
 		MatchString:            srlv1.DeviceMatch,
 		Subscriptions:          o.GetSubscriptions(),
-		ExcpetionPaths:         o.GetExceptionPaths(),
+		ExceptionPaths:         o.GetExceptionPaths(),
 		ExplicitExceptionPaths: o.GetExplicitExceptionPaths(),
 	})
 	if err != nil {
@@ -301,7 +310,7 @@ func (e *external) Update(ctx context.Context, mg resource.Managed) (managed.Ext
 		DeviceType:             string(srlv1.DeviceTypeSRL),
 		MatchString:            srlv1.DeviceMatch,
 		Subscriptions:          o.GetSubscriptions(),
-		ExcpetionPaths:         o.GetExceptionPaths(),
+		ExceptionPaths:         o.GetExceptionPaths(),
 		ExplicitExceptionPaths: o.GetExplicitExceptionPaths(),
 	})
 	if err != nil {
