@@ -1,0 +1,7 @@
+apiVersion: meta.pkg.ndd.henderiw.be/v1
+kind: Provider
+metadata:
+  name: ndd-provider-srl
+spec:
+  controller:
+    image: henderiw/ndd-provider-srl-controller:latest
