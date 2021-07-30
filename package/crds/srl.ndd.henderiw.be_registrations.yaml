@@ -1,3 +1,5 @@
+
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -66,7 +68,7 @@ spec:
                 - Orphan
                 - Delete
                 type: string
-              forProvider:
+              forNetworkNode:
                 properties:
                   exceptionPaths:
                     description: ExceptionPaths defines the exception paths that should
@@ -102,14 +104,17 @@ spec:
                 - name
                 type: object
             required:
-            - forProvider
+            - forNetworkNode
             type: object
           status:
             description: A RegistrationStatus represents the observed state of a Registration.
             properties:
-              atProvider:
+              atNetworkNode:
                 description: RegistrationObservation are the observable fields of
                   a Registration.
+                properties:
+                  test:
+                    type: string
                 type: object
               conditions:
                 description: Conditions of the resource.

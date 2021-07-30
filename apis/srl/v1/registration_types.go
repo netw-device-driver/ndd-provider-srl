@@ -44,18 +44,19 @@ type RegistrationParameters struct {
 
 // RegistrationObservation are the observable fields of a Registration.
 type RegistrationObservation struct {
+	Test string `json:"test,omitempty"`
 }
 
 // A RegistrationSpec defines the desired state of a Registration.
 type RegistrationSpec struct {
 	nddv1.ResourceSpec `json:",inline"`
-	ForProvider        RegistrationParameters `json:"forProvider"`
+	ForNetworkNode     RegistrationParameters `json:"forNetworkNode"`
 }
 
 // A RegistrationStatus represents the observed state of a Registration.
 type RegistrationStatus struct {
 	nddv1.ResourceStatus `json:",inline"`
-	AtProvider           RegistrationObservation `json:"atProvider,omitempty"`
+	AtNetworkNode        RegistrationObservation `json:"atNetworkNode,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -89,25 +90,25 @@ func init() {
 }
 
 func (o *Registration) GetSubscriptions() []string {
-	return o.Spec.ForProvider.Subscriptions
+	return o.Spec.ForNetworkNode.Subscriptions
 }
 
 func (o *Registration) SetSubscriotions(sub []string) {
-	o.Spec.ForProvider.Subscriptions = sub
+	o.Spec.ForNetworkNode.Subscriptions = sub
 }
 
 func (o *Registration) GetExceptionPaths() []string {
-	return o.Spec.ForProvider.ExceptionPaths
+	return o.Spec.ForNetworkNode.ExceptionPaths
 }
 
 func (o *Registration) SetExceptionPaths(ep []string) {
-	o.Spec.ForProvider.ExceptionPaths = ep
+	o.Spec.ForNetworkNode.ExceptionPaths = ep
 }
 
 func (o *Registration) GetExplicitExceptionPaths() []string {
-	return o.Spec.ForProvider.ExceptionPaths
+	return o.Spec.ForNetworkNode.ExceptionPaths
 }
 
 func (o *Registration) SetExplicitExceptionPaths(eep []string) {
-	o.Spec.ForProvider.ExceptionPaths = eep
+	o.Spec.ForNetworkNode.ExceptionPaths = eep
 }

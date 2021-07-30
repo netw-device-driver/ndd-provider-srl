@@ -54,7 +54,7 @@ func (lo *RegistrationObject) Run(ctx context.Context, kube client.Client) error
 				DeletionPolicy: nddv1.DeletionDelete,
 				Active:         true,
 			},
-			ForProvider: srlv1.RegistrationParameters{
+			ForNetworkNode: srlv1.RegistrationParameters{
 				Subscriptions: []string{
 					"/acl",
 					"/bfd",
