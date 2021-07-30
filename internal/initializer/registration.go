@@ -49,10 +49,9 @@ func (lo *RegistrationObject) Run(ctx context.Context, kube client.Client) error
 		Spec: srlv1.RegistrationSpec{
 			ResourceSpec: nddv1.ResourceSpec{
 				NetworkNodeReference: &nddv1.Reference{
-					Name: "leaf1",
-					//Name: "all",
+					Name: "all",
 				},
-				DeletionPolicy: nddv1.DeletionOrphan,
+				DeletionPolicy: nddv1.DeletionDelete,
 				Active:         true,
 			},
 			ForProvider: srlv1.RegistrationParameters{

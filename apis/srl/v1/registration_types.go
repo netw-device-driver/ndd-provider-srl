@@ -44,7 +44,6 @@ type RegistrationParameters struct {
 
 // RegistrationObservation are the observable fields of a Registration.
 type RegistrationObservation struct {
-	//ObservableField string `json:"observableField,omitempty"`
 }
 
 // A RegistrationSpec defines the desired state of a Registration.
@@ -64,10 +63,10 @@ type RegistrationStatus struct {
 // Registration is the Schema for the Registrations API
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="TARGET",type="string",JSONPath=".status.conditions[?(@.kind=='TargetFound')].status"
-// +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.bindingPhase"
-// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.atProvider.state"
+// +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.conditions[?(@.kind=='Ready')].status"
+// +kubebuilder:printcolumn:name="SYNC",type="string",JSONPath=".status.conditions[?(@.kind=='Synced')].status"
 // +kubebuilder:printcolumn:name="AGE",type="date",JSONPath=".metadata.creationTimestamp"
-// +kubebuilder:resource:scope=Cluster,categories={srl},shortName=srlreg
+// +kubebuilder:resource:scope=Cluster,categories={ndd,srl},shortName=srlreg
 type Registration struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
